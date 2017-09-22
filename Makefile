@@ -80,7 +80,9 @@ _REDIR_STDOUT:=2>&1 </dev/null >/dev/null $(_SED_HIGHLIGHT_ERRORS) >&2
 
 define func-run-vim
 	$(info Using: $(shell $(TEST_VIM_PREFIX) $(TEST_VIM) --version | head -n2))
-	$(TEST_VIM_PREFIX) $(TEST_VIM) $(if $(IS_NEOVIM),$(if $(_REDIR_STDOUT),--headless,),-X) --noplugin -Nu $(TEST_VIMRC) -i NONE $(VIM_ARGS) $(_REDIR_STDOUT)
+	$(TEST_VIM_PREFIX) $(TEST_VIM) \
+	  $(if $(IS_NEOVIM),$(if $(_REDIR_STDOUT),--headless,),-X) \
+	  --noplugin -Nu $(TEST_VIMRC) -i NONE $(VIM_ARGS) $(_REDIR_STDOUT)
 endef
 
 # Interactive tests, keep Vader open.
