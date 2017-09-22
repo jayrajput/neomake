@@ -17,7 +17,7 @@ test_interactive: $(if $(TEST_VIM),$(if $(IS_NEOVIM),testnvim_interactive,testvi
 
 VADER:=Vader!
 VADER_OPTIONS:=-q
-VADER_ARGS=tests/neomake.vader
+VADER_ARGS=tests/main.vader
 VIM_ARGS='+$(VADER) $(VADER_OPTIONS) $(VADER_ARGS)'
 
 DEFAULT_VADER_DIR:=tests/vim/plugins/vader
@@ -248,8 +248,8 @@ travis_lint:
 check:
 	@:; ret=0; \
 	echo '== Checking that all tests are included'; \
-	for f in $(filter-out neomake.vader,$(notdir $(shell git ls-files tests/*.vader))); do \
-	  if ! grep -q "^Include.*: $$f" tests/neomake.vader; then \
+	for f in $(filter-out main.vader,$(notdir $(shell git ls-files tests/*.vader))); do \
+	  if ! grep -q "^Include.*: $$f" tests/main.vader; then \
 	    echo "Test not included: $$f" >&2; ret=1; \
 	  fi; \
 	done; \
