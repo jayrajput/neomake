@@ -68,13 +68,13 @@ after_success:
   - |
     set -x
     for d in profile-output.*; do
-      prof_flags=${d#profile-output.}
-      prof_flags=${prof_flags// /}
+      name=${d#profile-output.}
+      prof_flags=${name// /}
       prof_flags=${prof_flags//./}
 
       (cd "$d"
         covimerage write_coverage *.profile || exit 1
-        codecov --required --flags $CODECOV_FLAGS $prof_flags)
+        codecov --required --name "$name" --flags $CODECOV_FLAGS $prof_flags)
 
       set +x
-    fi
+    done

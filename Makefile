@@ -224,7 +224,7 @@ travis_test:
 	    echo "== Running \"make $$2\" =="; \
 	    mkdir profile-output.$$1; \
 	    make DOCKER_MAKE_TEST_TARGET=testcoverage \
-	      NEOMAKE_COVERAGE_DIR=profile-output.$$1 $$2 || return; \
+	      NEOMAKE_COVERAGE_DIR=profile-output.docker-$$1 $$2 || return; \
 	    echo "travis_fold:end:script.$$1"; \
 	  }; \
 	  travis_run_make neovim-v0.2.0 "docker_test DOCKER_VIM=neovim-v0.2.0" || (( ret+=1  )); \
