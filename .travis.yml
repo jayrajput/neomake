@@ -18,7 +18,7 @@ matrix:
         - docker
     - env: ENV=travis_lint
       language: python
-    - env: ENV=testnvim
+    - env: ENV=testcoverage TEST_VIM=nvim
     - env: ENV=testvim-7.4.52
 
 install:
@@ -30,23 +30,38 @@ install:
         MAKE_ARGS="$MAKE_ARGS docker_vimhelplint"
         echo 'doc/neomake.txt changed, running docker_vimhelplint'
       fi
-    elif [ "$ENV" = "testnvim" ]; then
+    fi
+    if [ "$TEST_VIM" = "nvim" ]; then
       eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
 
-      # Install vim-vimhelplint for one build.
-      make build/vimhelplint
+      if [ "$ENV" = testcoverage ]; then
+        # Install vim-vimhelplint for one build.
+        make build/vimhelplint
+      fi
     fi
-    umask 022
-
-script:
-  - |
-    set -e
     if [[ "$ENV" = "testvim-7.4.52" ]]; then
       vim --version
       if ! vim --version 2>&1 | grep -F 'VIM - Vi IMproved 7.4' -A1 | grep -q '^Included patches: 1-52'; then
         echo 'Unexpected Vim version (expected 7.4.52)' >&2
         exit 1
       fi
-      ENV=testvim
+      ENV=testcoverage
+      MAKE_ARGS="$MAKE_ARGS TEST_VIM=vim"
     fi
+    if [[ "$ENV" = testcoverage ]]; then
+      python -m virtualenv venv
+      source venv/bin/activate
+      pip install codecov https://github.com/Vimjas/covimerage/archive/develop.zip
+    fi
+    umask 022
+
+script:
   - make $ENV $MAKE_ARGS || exit 1
+
+after_success:
+  - |
+    if [[ -f .coverage ]]; then
+      set -x
+      codecov --name $ENV --flags $TEST_VIM
+      set +x
+    fi

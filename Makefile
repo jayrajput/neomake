@@ -117,6 +117,16 @@ $(_TESTS_REL_AND_ABS):
 	make $(FILE_TEST_TARGET) VADER_ARGS='$@'
 .PHONY: $(_TESTS_REL_AND_ABS)
 
+testcoverage:
+	@set -x; ret=0; \
+	cov_dir=$$(mktemp -d); \
+	for testfile in tests/main.vader $(wildcard tests/isolated/*vader); do \
+	  make test VADER_ARGS=$$testfile \
+	    NEOMAKE_COVERAGE_FILE=$$cov_dir/$$(basename $$testfile).profile || (( ++ret )); \
+	done; \
+	covimerage write_coverage $$cov_dir/*.profile; \
+	exit $$ret
+
 tags:
 	ctags -R --langmap=vim:+.vader
 .PHONY: tags
