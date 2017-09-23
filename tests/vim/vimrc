@@ -34,7 +34,7 @@ let plugin_dir = expand('<sfile>:p:h:h:h')
 let &runtimepath .= ','.plugin_dir
 
 let coverage_file = $NEOMAKE_COVERAGE_FILE
-if !empty(coverage_file)
+if !empty(coverage_file) && has('profile')
   if filereadable(coverage_file)
     echoerr 'DO_COVERAGE: file exists, not overwriting: '.coverage_file
     " Use cquit here to cause a non-zero exit code.

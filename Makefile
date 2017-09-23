@@ -117,14 +117,15 @@ $(_TESTS_REL_AND_ABS):
 	make $(FILE_TEST_TARGET) VADER_ARGS='$@'
 .PHONY: $(_TESTS_REL_AND_ABS)
 
+testcoverage: NEOMAKE_COVERAGE_DIR?=
 testcoverage:
 	@set -x; ret=0; \
-	cov_dir=$$(mktemp -d); \
+	cov_dir=$(NEOMAKE_COVERAGE_DIR); \
+	if [ -z "$$cov_dir" ]; then cov_dir=$$(mktemp -d); fi; \
 	for testfile in tests/main.vader $(wildcard tests/isolated/*vader); do \
 	  make test VADER_ARGS=$$testfile \
 	    NEOMAKE_COVERAGE_FILE=$$cov_dir/$$(basename $$testfile).profile || (( ++ret )); \
 	done; \
-	covimerage write_coverage $$cov_dir/*.profile; \
 	exit $$ret
 
 tags:
@@ -221,7 +222,9 @@ travis_test:
 	  travis_run_make() { \
 	    echo "travis_fold:start:script.$$1"; \
 	    echo "== Running \"make $$2\" =="; \
-	    make $$2 || return; \
+	    mkdir profile-output.$$1; \
+	    make DOCKER_MAKE_TEST_TARGET=testcoverage \
+	      NEOMAKE_COVERAGE_DIR=profile-output.$$1 $$2 || return; \
 	    echo "travis_fold:end:script.$$1"; \
 	  }; \
 	  travis_run_make neovim-v0.2.0 "docker_test DOCKER_VIM=neovim-v0.2.0" || (( ret+=1  )); \

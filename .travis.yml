@@ -18,8 +18,8 @@ matrix:
         - docker
     - env: ENV=travis_lint
       language: python
-    - env: ENV=testcoverage TEST_VIM=nvim
-    - env: ENV=testvim-7.4.52
+    - env: ENV=testcoverage TEST_VIM=nvim NEOMAKE_COVERAGE_DIR=profile-output.nvim-master
+    - env: ENV=testvim-7.4.52 NEOMAKE_COVERAGE_DIR=profile-output.vim7452
 
 install:
   - |
@@ -49,11 +49,15 @@ install:
       MAKE_ARGS="$MAKE_ARGS TEST_VIM=vim"
       CODECOV_FLAGS="$CODECOV_FLAGS vim vim7452"
     fi
-    if [[ "$ENV" = testcoverage ]]; then
+    if [[ "$ENV" != travis_lint ]]; then
       python -m virtualenv venv
       source venv/bin/activate
       pip install codecov https://github.com/Vimjas/covimerage/archive/develop.zip
       CODECOV_FLAGS="$CODECOV_FLAGS $TEST_VIM"
+
+      if [[ -n "$NEOMAKE_COVERAGE_DIR" ]]; then
+        mkdir "$NEOMAKE_COVERAGE_DIR"
+      fi
     fi
     umask 022
 
@@ -62,8 +66,15 @@ script:
 
 after_success:
   - |
-    if [[ -f .coverage ]]; then
-      set -x
-      codecov --required --name $ENV --flags $CODECOV_FLAGS
+    set -x
+    for d in profile-output.*; do
+      prof_flags=${d#profile-output.}
+      prof_flags=${prof_flags// /}
+      prof_flags=${prof_flags//./}
+
+      (cd "$d"
+        covimerage write_coverage *.profile || exit 1
+        codecov --required --flags $CODECOV_FLAGS $prof_flags)
+
       set +x
     fi
