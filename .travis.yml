@@ -64,6 +64,6 @@ after_success:
   - |
     if [[ -f .coverage ]]; then
       set -x
-      codecov --name $ENV --flags $CODECOV_FLAGS
+      codecov --required --name $ENV --flags $CODECOV_FLAGS
       set +x
     fi
