@@ -47,11 +47,13 @@ install:
       fi
       ENV=testcoverage
       MAKE_ARGS="$MAKE_ARGS TEST_VIM=vim"
+      CODECOV_FLAGS="$CODECOV_FLAGS vim vim7452"
     fi
     if [[ "$ENV" = testcoverage ]]; then
       python -m virtualenv venv
       source venv/bin/activate
       pip install codecov https://github.com/Vimjas/covimerage/archive/develop.zip
+      CODECOV_FLAGS="$CODECOV_FLAGS $TEST_VIM"
     fi
     umask 022
 
@@ -62,6 +64,6 @@ after_success:
   - |
     if [[ -f .coverage ]]; then
       set -x
-      codecov --name $ENV --flags $TEST_VIM
+      codecov --name $ENV --flags $CODECOV_FLAGS
       set +x
     fi
