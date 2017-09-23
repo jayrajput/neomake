@@ -57,7 +57,3 @@ Include (JavaScript): ft_javascript.vader
 Include (PureScript): ft_purescript.vader
 Include (Go): ft_go.vader
 Include (ReStructuredText): ft_rst.vader
-
-~ Isolated tests (run separately with coverage)
-Include: isolated/compat-get_argv-on-emulated-windows.vader
-Include: isolated/utils-DebugMessage-handles-missing-make-options.vader
